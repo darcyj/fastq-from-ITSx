@@ -1,6 +1,4 @@
-#!/usr/local/bin/Rscript
-
-# on linux, change the top line to /usr/bin/env Rscript
+#!/usr/bin/env Rscript
 
 ## Script Info: This program takes a fasta file that has been processed with ITSx, and 
 	# adds quality scores from the original fastq file. 
