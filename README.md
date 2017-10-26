@@ -7,4 +7,7 @@ These two R scripts can be used with ITSx in order to get fastq files as an outp
 ITSx -i my_raw_seqs.fasta -o my_extracted_seqs -t --cpu 8 --graphical F --preserve T --save_regions ITS1
 ./itsx_fastq_extractor.r -f my_extracted_seqs.ITS1.fasta -q my_raw_seqs.fastq --threads 8 -o my_extracted_seqs.ITS1.fastq
 
-Note: This won't work on interleaved files. Not sure if interleaved fastq is a thing, even. I hope not. 
+Requirements/notes:
+1. Requires R package "optparse". Install beforehand with 
+    install.packages("optparse")
+2. This won't work on interleaved files. Not sure if interleaved fastq is a thing, even. I hope not.
