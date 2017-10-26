@@ -1,6 +1,4 @@
-#!/usr/local/bin/Rscript
-
-# on linux, change the top line to /usr/bin/env Rscript
+#!/usr/bin/env Rscript
 
 # Script Info: this just turns a fastq file into a fasta file in the DUMBEST way possible
 # it preserves ALL sequence name stuff, and doesn't process the sequence at all. 
