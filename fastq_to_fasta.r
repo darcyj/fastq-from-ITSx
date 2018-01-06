@@ -11,7 +11,11 @@ option_list <- list(
 	make_option(c("-i", "--input"), action="store", default=NA, type='character',
 		help="Input fastq file path."), 
 	make_option(c("-o", "--output"), action="store", default=NA, type='character',
-		help="Output fasta file path")
+		help="Output fasta file path"),
+	make_option(c("-d", "--downsample"), action="store", default=0, type='integer',
+		help="Randomly downsample input to n seqs. Default=0=no downsampling"),
+	make_option(c("--seed"), action="store", default=12345, type='integer',
+		help="A seed for the RNG to randomly sample with, default=12345")
 ) 
 opt = parse_args(OptionParser(option_list=option_list))
 
@@ -84,6 +88,12 @@ write.fastx <- function(outfile, fastxlist, out=c("fastq", "fasta")){
 }
 
 input_fastq <- read.fastx(file=opt$input, type="fastq")
+
+# downsample input sequences, maybe
+if(opt$downsample > 0 && opt$downsample < length(input_fastq)){
+	seqs2get <- sample(1:length(input_fastq), size=opt$downsample, replace=FALSE)
+	input_fastq <- input_fastq[seqs2get]
+}
 
 write.fastx(outfile=opt$output, input_fastq, out="fasta")
 
