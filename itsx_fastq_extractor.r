@@ -155,11 +155,15 @@
 	# x is a string of [ATGC], all upper case
 	reverse.compliment <- function(x){
 		# map for complimentary nucleotides
-		comp_map <- setNames(c("A", "T", "G", "C"), c("T", "A", "C", "G"))
+		comp_map <- setNames(
+			c("A", "T", "G", "C", "N", "R", "Y", "S", "W", "K", "M", "B", "V", "D", "H", "-"), 
+			c("T", "A", "C", "G", "N", "Y", "R", "S", "W", "M", "K", "V" ,"B" ,"H", "D", "-"))
 		# turn string x into character vector
 		x <- unlist(strsplit(x, split=""))
 		# reverse-compliment x
 		x_rc <- rev(comp_map[unlist(x)])
+		# turn "NA"s into Ns
+		x_rc[is.na(x_rc)] <- "N"
 		# return x_rc as string
 		return(paste(x_rc, collapse=""))
 	}
@@ -176,6 +180,8 @@
 		start_ind <- regexpr(pattern=x[1], text=x[2], fixed=TRUE)[1]
 
 		# if it wasn't found, RC fastq stuff (not itsx seq)
+		# this way, the output sequence orientation is the same direction as
+		# ITSx wanted it to be.
 		if(start_ind == -1){
 			x[2] <- reverse.compliment(x[2])
 			# qual scores are just reversed :)
@@ -186,6 +192,7 @@
 			# if it STILL isn't found, return seq as error so it can be removed later
 			if(start_ind == -1){
 				x[1] <- "seq_not_found"
+				quals <- "seq_not_found"
 			}else{
 				stop_ind <- nchar(x[1]) + start_ind - 1
 				quals <- substr(x[3], start=start_ind, stop=stop_ind)
@@ -206,8 +213,41 @@
 		#extract.quals(testx)
 
 
-## build output fasta file in parallel
-	output <- mclapply(X=combined_list, FUN=extract.quals, mc.cores=opt$threads)
+## build output fasta file
+	# non-parallel version written separately for diagnostic purposes, like "which sequence breaks the script"
+	if(opt$threads == 1){
+		# make blank list to write to
+		output <- list()
+		for(i in 1:length(combined_list)){
+			output[[i]] <- tryCatch(
+				{
+					# what to do if no errors:
+					extract.quals(combined_list[[i]])
+				},
+				error=function(cond){
+					# what do do if there's an error:
+					message("ERROR at seq:")
+					message( names(combined_list)[i] )
+					message( paste("i = ", i) )
+					message( "error message:" )
+					message( cond )
+				},
+				warning=function(cond){
+					# what do do if there's a warning:
+					message("WARNING at seq:")
+					message(names(combined_list)[i])
+					message(paste("i = ", i))
+					message("warning message:")
+					message(cond)
+				}
+			)
+		}
+	}else if(opt$threads > 1){
+		output <- mclapply(X=combined_list, FUN=extract.quals, mc.cores=opt$threads)
+	}else{
+		stop("invalid --threads argument.")
+	}
+
 
 ## remove items from output that failed to find
 	identify_bad_seqs <- function(x){
@@ -219,6 +259,10 @@
 	}
 	badseqs <- lapply(X=output, FUN=identify_bad_seqs)
 	output <- output[badseqs == "good"]
+	if(sum(badseqs=="bad") > 0){
+		print(paste("Quality extraction FAILED for", sum(badseqs=="bad"), "entries."))
+		print("Make sure there are no Us (uracil) or non-IUPAC codes in your DNA data?")
+	}
 
 
 ## write out fastq file
