@@ -7,7 +7,7 @@ These two R scripts can be used with ITSx in order to get fastq files as an outp
 ./fastq_to_fasta.r -i my_raw_seqs.fastq -o my_raw_seqs.fasta
 
 # 2. Run ITSx on that fasta copy you just made:
-/# note: ITSx just appends ".ITS1.fasta" to your -o here, and that's the file you'll use in step 3
+# note: ITSx just appends ".ITS1.fasta" to your -o here, and that's the file you'll use in step 3
 ITSx -i my_raw_seqs.fasta -o my_extracted_seqs -t "Fungi" --cpu 8 --graphical F --preserve T --save_regions ITS1
 
 # 3. Add quality data back into the fasta sequences extracted with ITSx:
