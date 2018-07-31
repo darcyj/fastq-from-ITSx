@@ -31,3 +31,4 @@ Requirements/notes:
 2. This won't work on interleaved files. Not sure if interleaved fastq is a thing, even. I hope not.
 3. This DOES work with gzipped files. It doesn't write them, though. 
 4. ITSx produces a ton of extra files that you probably don't want. HIGHLY recommend running this in its own dir so that you can keep the final product and easily rm everything else.
+5. Probably won't work with RNA data (U instead of T). To process those data, change all Us to Ts first.
