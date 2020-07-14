@@ -1,6 +1,8 @@
 # fastq-from-ITSx
 These scripts allow ITSx to be used with fastq files, with minimal overhead.
 
+NOTE: I wrote this before ITSxpress existed. You should just use it if you can: https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6206612/
+
 These two R scripts can be used with ITSx in order to get fastq files as an output. This is useful if you are running a program like DADA2 to cluster your extracted sequence data, since it uses quality scores of sequences. The general workflow is to make a fasta copy of your fastq file (the script just deletes quality data), run ITSx on that fasta file, then copy the quality information from your original fastq file back into the ITSx extracted fasta sequence data. When quality data are added back in, the script uses a 100% sequence data match to make sure it pulls out the right quality data. This works because ITSx only pulls out a subset of the sequence - it doesn't edit it at all. You'd run these scripts as follows:
 ```
 # 1. Create a fasta copy of your input fastq file:
